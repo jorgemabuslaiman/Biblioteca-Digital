@@ -28,7 +28,7 @@ function App() {
   });
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-b from-blue-50 to-white font-sans">
+    <div className="min-h-screen flex flex-col bg-linear-to-b from-blue-50 to-white font-sans">
       <Header />
       <Hero />
       <section id="catalogo" className="max-w-7xl mx-auto py-8 px-6">
