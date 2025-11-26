@@ -1,27 +1,49 @@
 import React, { useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useLocation } from 'react-router-dom';
 import Header from '../components/Header';
 import BookCard from '../components/BookCard';
 import Footer from '../components/Footer';
 import { librosDestacados } from '../librosData';
 
+
 export default function Catalogo() {
   const PAGE_SIZE = 8;
   const { nombre } = useParams();
   const navigate = useNavigate();
+  const location = useLocation();
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState(nombre || "");
+  const [filterRango, setFilterRango] = useState("");
+
+  // Leer query param de rango etario
+  React.useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const rango = params.get('rango');
+    if (rango) setFilterRango(rango);
+    else setFilterRango("");
+  }, [location.search]);
 
   // Actualiza filtro si cambia la URL
   React.useEffect(() => {
     if (nombre) setFilterCategory(nombre);
   }, [nombre]);
 
+  // Relación de rangos etarios a categorías
+  const categoriasPorRango = {
+    '0-3 años': ['Infantil'],
+    '4-6 años': ['Infantil', 'Educativo'],
+    '7-9 años': ['Infantil', 'Aventura', 'Educativo'],
+    '10-12 años': ['Juvenil', 'Aventura', 'Ciencia', 'Fantasía', 'Educativo'],
+    '13+ años': ['Juvenil', 'Clásicos', 'Misterio', 'Ciencia', 'Fantasía'],
+  };
+
+  const categoriasFiltradas = filterRango && categoriasPorRango[filterRango] ? categoriasPorRango[filterRango] : null;
 
   const filteredBooks = librosDestacados.filter(libro => {
     const matchesSearch = libro.title.toLowerCase().includes(search.toLowerCase()) || libro.author.toLowerCase().includes(search.toLowerCase());
     const matchesCategory = !filterCategory || filterCategory === "Todas" || libro.category === filterCategory;
-    return matchesSearch && matchesCategory;
+    const matchesRango = !categoriasFiltradas || categoriasFiltradas.includes(libro.category);
+    return matchesSearch && matchesCategory && matchesRango;
   });
 
   // Paginación
@@ -58,14 +80,22 @@ export default function Catalogo() {
             className="border border-blue-300 rounded px-4 py-2 w-full md:w-1/4 focus:outline-none focus:ring-2 focus:ring-blue-400"
           >
             <option value="">Todas las categorías</option>
-            <option value="Infantil">Infantil</option>
-            <option value="Juvenil">Juvenil</option>
-            <option value="Aventura">Aventura</option>
-            <option value="Ciencia">Ciencia</option>
-            <option value="Fantasía">Fantasía</option>
-            <option value="Educativo">Educativo</option>
-            <option value="Clásicos">Clásicos</option>
-            <option value="Misterio">Misterio</option>
+            {(
+              categoriasFiltradas
+                ? categoriasFiltradas
+                : [
+                    "Infantil",
+                    "Juvenil",
+                    "Aventura",
+                    "Ciencia",
+                    "Fantasía",
+                    "Educativo",
+                    "Clásicos",
+                    "Misterio",
+                  ]
+            ).map(cat => (
+              <option key={cat} value={cat}>{cat}</option>
+            ))}
           </select>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8 justify-items-center items-stretch">

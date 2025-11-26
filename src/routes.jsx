@@ -5,7 +5,10 @@ import Catalogo from './pages/Catalogo';
 import Categorias from './pages/Categorias';
 import LibroDetalle from './pages/LibroDetalle';
 import VisorLibro from './pages/VisorLibro';
+
+
 import Contacto from './pages/Contacto';
+import GamificacionPage from './pages/Gamificacion';
 
 export default function AppRoutes() {
   return (
@@ -18,6 +21,7 @@ export default function AppRoutes() {
   <Route path="/libro/:id" element={<LibroDetalle />} />
   <Route path="/leer/:id" element={<VisorLibro />} />
   <Route path="/contacto" element={<Contacto />} />
+        <Route path="/gamificacion" element={<GamificacionPage />} />
       </Routes>
     </BrowserRouter>
   );

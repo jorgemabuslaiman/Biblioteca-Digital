@@ -13,6 +13,7 @@ function Header() {
           <Link to="/" className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400">Inicio</Link>
           <Link to="/catalogo" className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400">Catálogo</Link>
           <Link to="/categorias" className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400">Categorías</Link>
+          <Link to="/gamificacion" className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400 text-yellow-300 font-bold">Mundo Lector</Link>
           <Link to="/contacto" className="hover:underline focus:outline-none focus:ring-2 focus:ring-blue-400">Contacto</Link>
         </nav>
         <button className="bg-white text-blue-700 px-4 py-2 rounded-lg font-semibold shadow hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-400 transition">Iniciar sesión</button>
