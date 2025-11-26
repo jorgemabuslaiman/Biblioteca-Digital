@@ -1,11 +1,51 @@
+// Utilidad para obtener puntaje total y cantidad de cuestionarios
+function getResumenCuestionarios() {
+  let totalPuntaje = 0;
+  let totalPreguntas = 0;
+  let completados = 0;
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('cuestionario_'));
+    keys.forEach(k => {
+      const data = JSON.parse(localStorage.getItem(k));
+      if (data && data.terminado && typeof data.puntaje === 'number') {
+        completados++;
+        totalPuntaje += data.puntaje;
+        totalPreguntas += 10; // Asumimos 10 preguntas por cuestionario
+      }
+    });
+  } catch {}
+  return { totalPuntaje, totalPreguntas, completados };
+}
 import React from "react";
 
-// Ejemplo de medallas y retos (puedes expandirlo luego)
-const medallasEjemplo = [
-  { nombre: "Primer Libro", icono: "🥇", descripcion: "Leíste tu primer libro" },
-  { nombre: "Explorador", icono: "🌎", descripcion: "Visitaste 5 géneros distintos" },
-  { nombre: "Maratón", icono: "🏃‍♂️", descripcion: "Leíste 3 libros en una semana" },
-];
+
+function getMedallasGamificacion() {
+  let completados = 0;
+  let perfectos = 0;
+  let generos = new Set();
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('cuestionario_'));
+    keys.forEach(k => {
+      const data = JSON.parse(localStorage.getItem(k));
+      if (data && data.terminado && typeof data.puntaje === 'number') {
+        completados++;
+        if (data.puntaje === 10) perfectos++;
+        // Extraer género del libro si está disponible
+        const libroIdx = parseInt(k.split('_')[1], 10);
+        if (!isNaN(libroIdx) && window.librosDestacados) {
+          const libro = window.librosDestacados[libroIdx];
+          if (libro && libro.category) generos.add(libro.category);
+        }
+      }
+    });
+  } catch {}
+  const medallas = [];
+  if (completados >= 1) medallas.push({ nombre: "Primer Cuestionario", icono: "🥇", descripcion: "Completaste tu primer cuestionario" });
+  if (completados >= 5) medallas.push({ nombre: "Lector Constante", icono: "📚", descripcion: "Completaste 5 cuestionarios" });
+  if (perfectos >= 1) medallas.push({ nombre: "¡Perfecto!", icono: "💯", descripcion: "Obtuviste 100% en un cuestionario" });
+  if (generos.size >= 3) medallas.push({ nombre: "Explorador", icono: "🌎", descripcion: "Completaste cuestionarios de 3 géneros distintos" });
+  return medallas;
+}
 
 const retosEjemplo = [
   { nombre: "Reto Tucumán", descripcion: "Lee un libro de un autor tucumano" },
@@ -13,6 +53,7 @@ const retosEjemplo = [
 ];
 
 const Gamificacion = ({ usuario }) => {
+  const resumen = getResumenCuestionarios();
   return (
     <section className="bg-slateGray py-10 rounded-xl shadow-lg my-8">
       <h2 className="text-2xl font-bold text-primary mb-4 text-center">
@@ -33,12 +74,17 @@ const Gamificacion = ({ usuario }) => {
             ></div>
           </div>
           <span className="text-xs text-gray-600">Progreso lector: {usuario?.progreso || 20}%</span>
+          <span className="text-xs text-gray-700 mt-1">Cuestionarios completados: <b>{resumen.completados}</b></span>
+          <span className="text-xs text-gray-700">Puntaje total: <b>{resumen.totalPuntaje}</b> / {resumen.totalPreguntas}</span>
         </div>
         {/* Medallas */}
         <div className="flex flex-col items-center">
           <h3 className="text-lg font-bold text-secondary mb-2">Medallas</h3>
           <div className="flex gap-4 flex-wrap justify-center">
-            {medallasEjemplo.map((med, idx) => (
+            {getMedallasGamificacion().length === 0 && (
+              <div className="text-gray-500 text-sm">¡Aún no tienes medallas! Responde cuestionarios para ganar logros.</div>
+            )}
+            {getMedallasGamificacion().map((med, idx) => (
               <div key={idx} className="flex flex-col items-center bg-white rounded-lg shadow p-3 w-24">
                 <span className="text-3xl mb-1">{med.icono}</span>
                 <span className="font-semibold text-sm text-primary text-center">{med.nombre}</span>

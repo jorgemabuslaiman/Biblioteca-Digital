@@ -4,11 +4,30 @@ import Header from "../components/Header";
 import Footer from "../components/Footer";
 import Gamificacion from "../components/Gamificacion";
 
-// Simulación de usuario (puedes conectar con contexto o backend luego)
+
+// Calcular progreso lector a partir de cuestionarios completados
+function getProgresoLector() {
+  let total = 0;
+  let correctas = 0;
+  try {
+    const keys = Object.keys(localStorage).filter(k => k.startsWith('cuestionario_'));
+    keys.forEach(k => {
+      const data = JSON.parse(localStorage.getItem(k));
+      if (data && data.terminado && typeof data.puntaje === 'number') {
+        total += 10; // Cada cuestionario tiene 10 preguntas
+        correctas += data.puntaje;
+      }
+    });
+  } catch {}
+  if (total === 0) return 0;
+  // Progreso: porcentaje de respuestas correctas sobre el total posible
+  return Math.round((correctas / total) * 100);
+}
+
 const usuarioDemo = {
   nombre: "Sofi",
   avatar: "🦊",
-  progreso: 45,
+  progreso: getProgresoLector(),
 };
 
 const GamificacionPage = () => {

@@ -4,6 +4,7 @@ import Home from './pages/Home';
 import Catalogo from './pages/Catalogo';
 import Categorias from './pages/Categorias';
 import LibroDetalle from './pages/LibroDetalle';
+import ListadoCuestionarios from './pages/ListadoCuestionarios';
 import VisorLibro from './pages/VisorLibro';
 
 
@@ -22,6 +23,7 @@ export default function AppRoutes() {
   <Route path="/leer/:id" element={<VisorLibro />} />
   <Route path="/contacto" element={<Contacto />} />
         <Route path="/gamificacion" element={<GamificacionPage />} />
+        <Route path="/cuestionarios" element={<ListadoCuestionarios />} />
       </Routes>
     </BrowserRouter>
   );
