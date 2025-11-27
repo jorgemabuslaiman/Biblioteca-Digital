@@ -1,3 +1,4 @@
+import { useState } from "react";
 // Utilidad para obtener puntaje total y cantidad de cuestionarios
 function getResumenCuestionarios() {
   let totalPuntaje = 0;
@@ -54,6 +55,33 @@ const retosEjemplo = [
 
 const Gamificacion = ({ usuario }) => {
   const resumen = getResumenCuestionarios();
+
+  // Estado para avatar y popup
+  const [avatar, setAvatar] = useState(() => localStorage.getItem('avatar_usuario') || usuario?.avatar || "🦊");
+  const [showPopup, setShowPopup] = useState(false);
+  const [seleccionado, setSeleccionado] = useState(avatar);
+
+  // Opciones de avatares (animales y vehículos)
+  const avatares = [
+    "🦊", "🐻", "🐼", "🐯", "🐸", "🐵", "🐶", "🐱", "🦁", "🐮", "🐷", "🐰",
+    "🐔", "🐧", "🐢", "🐙", "🐬", "🦄", "🐴", "🐘", "🦓", "🦒", "🚗", "🚕", "🚙", "🚌", "🚓", "🚑", "🚒", "🚜", "🚲", "🛴", "🏍️", "🚂", "✈️", "🚀"
+  ];
+
+  // Borra todos los datos de cuestionarios y recarga la página
+  const reiniciarPuntajes = () => {
+    Object.keys(localStorage)
+      .filter(k => k.startsWith('cuestionario_'))
+      .forEach(k => localStorage.removeItem(k));
+    window.location.reload();
+  };
+
+  // Guardar avatar seleccionado
+  const aceptarAvatar = () => {
+    setAvatar(seleccionado);
+    localStorage.setItem('avatar_usuario', seleccionado);
+    setShowPopup(false);
+  };
+
   return (
     <section className="bg-slateGray py-10 rounded-xl shadow-lg my-8">
       <h2 className="text-2xl font-bold text-primary mb-4 text-center">
@@ -63,9 +91,14 @@ const Gamificacion = ({ usuario }) => {
         {/* Avatar y progreso */}
         <div className="flex flex-col items-center">
           <div className="w-24 h-24 rounded-full bg-deepSlate flex items-center justify-center text-5xl mb-2 border-4 border-primary">
-            {/* Avatar del usuario o ícono */}
-            {usuario?.avatar || "👦"}
+            {avatar}
           </div>
+          <button
+            onClick={() => { setSeleccionado(avatar); setShowPopup(true); }}
+            className="mb-2 bg-blue-500 hover:bg-blue-600 text-white px-3 py-1 rounded text-xs"
+          >
+            Cambiar imagen
+          </button>
           <div className="text-lg font-semibold text-midnight_text mb-1">{usuario?.nombre || "Invitado"}</div>
           <div className="w-32 bg-gray-200 rounded-full h-4 mb-2">
             <div
@@ -76,7 +109,43 @@ const Gamificacion = ({ usuario }) => {
           <span className="text-xs text-gray-600">Progreso lector: {usuario?.progreso || 20}%</span>
           <span className="text-xs text-gray-700 mt-1">Cuestionarios completados: <b>{resumen.completados}</b></span>
           <span className="text-xs text-gray-700">Puntaje total: <b>{resumen.totalPuntaje}</b> / {resumen.totalPreguntas}</span>
+          <button
+            onClick={reiniciarPuntajes}
+            className="mt-3 bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded shadow text-sm"
+          >
+            Reiniciar puntajes
+          </button>
         </div>
+
+        {/* Popup para elegir avatar */}
+        {showPopup && (
+          <div className="fixed inset-0 flex items-center justify-center z-50" style={{backdropFilter: 'blur(8px)', WebkitBackdropFilter: 'blur(8px)'}}>
+            <div className="bg-white rounded-xl shadow-lg p-6 max-w-lg w-full flex flex-col items-center">
+              <h3 className="text-lg font-bold mb-4">Elige tu imagen</h3>
+              <div className="grid grid-cols-6 gap-3 mb-6 max-h-64 overflow-y-auto">
+                {avatares.map((icon, idx) => (
+                  <button
+                    key={idx}
+                    className={`text-3xl w-12 h-12 flex items-center justify-center rounded-full border-2 transition-all ${seleccionado === icon ? 'border-blue-500 bg-blue-100 scale-110' : 'border-transparent bg-gray-100'}`}
+                    onClick={() => setSeleccionado(icon)}
+                  >
+                    {icon}
+                  </button>
+                ))}
+              </div>
+              <div className="flex gap-4 mt-2">
+                <button
+                  onClick={aceptarAvatar}
+                  className="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded shadow"
+                >Aceptar</button>
+                <button
+                  onClick={() => setShowPopup(false)}
+                  className="bg-gray-300 hover:bg-gray-400 text-gray-800 px-4 py-2 rounded shadow"
+                >Atrás</button>
+              </div>
+            </div>
+          </div>
+        )}
         {/* Medallas */}
         <div className="flex flex-col items-center">
           <h3 className="text-lg font-bold text-secondary mb-2">Medallas</h3>
